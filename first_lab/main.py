@@ -3,6 +3,9 @@ from src.operations import (binary_sum, to_additional, from_additional, add_addi
 from src.multiply_direct import (multiplication_of_numbers)
 from src.divide_direct import (devide_direct)
 from src.ieee import (decimal_to_ieee754, add_positive_ieee754, bits_to_string, change_sign, add_positive_and_negative_ieee754, ieee754_to_decimal, mul_ieee754)
+from src.code_version import (
+    number_to_2421, add_numbers_2421, bcd_2421_to_string, bcd_2421_to_decimal,
+)
 
 number = int(input("Enter number: "))
 
@@ -103,3 +106,21 @@ print("Второе число в IEEE-754:", bits_to_string(second_bits))
 print("Результат в IEEE-754:   ", bits_to_string(result_bits))
 print("Результат list:         ", result_bits)
 print("Результат в десятичной: ", ieee754_to_decimal(result_bits))
+
+#-------------------------------------------------------
+
+print("\nСЛОЖЕНИЕ ДВУХ ЧИСЕЛ В 2421 BCD")
+
+first_number = int(input("Введите первое число: "))
+second_number = int(input("Введите второе число: "))
+
+first_bcd = number_to_2421(first_number)
+second_bcd = number_to_2421(second_number)
+
+result_bcd = add_numbers_2421(first_number, second_number)
+result_decimal = bcd_2421_to_decimal(result_bcd)
+
+print("Первое число в 2421 BCD: ", bcd_2421_to_string(first_bcd))
+print("Второе число в 2421 BCD:", bcd_2421_to_string(second_bcd))
+print("Результат в 2421 BCD:   ", bcd_2421_to_string(result_bcd))
+print("Результат в десятичной: ", result_decimal)
