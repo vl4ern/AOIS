@@ -1,0 +1,11 @@
+[run]
+source =
+    src
+    main.py
+
+[report]
+omit =
+    */tests/*
+    */pycharm/*
+show_missing = True
+precision = 2
