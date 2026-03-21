@@ -71,7 +71,7 @@ def decimal_to_ieee754(number: float) -> list[int]:
     exponent_bits = pad_bits(exponent_bits, 8)
 
     mantissa_bits = (mantissa_source + [0] * 23)[:23]
-
+    
     return [sign] + exponent_bits + mantissa_bits
 
 
