@@ -4,6 +4,7 @@ from truth_table import (build_truth_table, print_truth_table)
 from normal_forms import (build_sdnf, build_sknf, build_numeric_sdnf, build_numeric_sknf,
                           build_maxterm, build_index_binary, build_index_decimal, build_minterm)
 from post_classes import (belongs_to_l, belongs_to_m, belongs_to_s, belongs_to_t0, belongs_to_t1)
+from polinom_zhegalkina import build_zheg
 
 
 def main():
@@ -25,6 +26,7 @@ def main():
     print("T1:", belongs_to_t1(table))
     print("S:", belongs_to_s(table))
     print("M:", belongs_to_m(table, variables))
+    print("Polinom Zhegalkin:", build_zheg(table, variables))
 
 if __name__ == "__main__":
     main()
