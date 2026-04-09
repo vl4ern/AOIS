@@ -74,9 +74,9 @@ def build_numeric_sknf(table: list[dict[str, int]], variables: list[str]) -> str
             indexes.append(get_row_index(row, variables))
 
     if not indexes:
-        return "Σ()"
+        return "Π()"
     
-    return "Σ(" + ", ".join(map(str,indexes)) + ")"
+    return "Π(" + ", ".join(map(str,indexes)) + ")"
 
 def build_index_binary(table: list[dict[str,int]]) -> str:
     bits = []

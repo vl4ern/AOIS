@@ -57,3 +57,20 @@ def build_zheg(table: list[dict[str, int]], variables: list[str]) -> str:
     coef = geta_zheg_coef(triangle)
 
     return build_zheg_polyn(coef, variables)
+
+def get_monom_degree(index: int) -> int:
+    binary = bin(index)[2:]
+    return binary.count("1")
+
+def belongs_to_l(coef: list[int]) -> bool:
+    for index in range(len(coef)):
+        if coef[index] == 1:
+            if get_monom_degree(index) > 1:
+                return False
+            
+    return True
+
+def get_zheg_coef_from_table(table: list[dict[str,int]]) -> list[int]:
+    result_vector = get_result_vector(table)
+    triangle = build_difference_triangle(result_vector)
+    return geta_zheg_coef(triangle)
