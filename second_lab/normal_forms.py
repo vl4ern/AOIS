@@ -44,7 +44,7 @@ def build_sknf(table: list[dict[str,int]], variables: list[str]) -> str:
     if not maxterms:
         return "1"
     
-    return " | ".join(maxterms)
+    return " & ".join(maxterms)
 
 def get_row_index(row: dict[str,int], variables: list[str]) -> int:
     binary = ""

@@ -32,6 +32,3 @@ def belongs_to_m(table: list[dict[str,int]], variables: list[str]) -> bool:
                     return False
                 
     return True
-
-def belongs_to_l():
-    pass
