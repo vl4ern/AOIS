@@ -7,10 +7,12 @@ from post_classes import (belongs_to_m, belongs_to_s, belongs_to_t0, belongs_to_
 from polinom_zhegalkina import (build_zheg, get_monom_degree, get_zheg_coef_from_table, belongs_to_l)
 from fictive_perem import find_fictive_perem
 from bool_deriv import (build_part_deriv_table, build_mixed_derivative_table)
-
+from minimization import ( get_minterms, minimize_by_calculation_with_steps, print_minimization_stages, 
+                          build_expression, minimize_by_tabular_method, print_coverage_table)
+from karnaugh import minimize_by_karnaugh_map, print_karnaugh_map
 
 def main():
-    expression = "a | (b & !b)"
+    expression = "(((!a -> b) & c) | !b)"
     variables = get_variables(expression)
     table = build_truth_table(expression)
     print("---The trurh table---")
@@ -45,6 +47,50 @@ def main():
     if len(variables) >= 3:
         derivative_abc = build_mixed_derivative_table(table, ["a", "b", "c"], variables)
         print("Mixed derivative by a, b, c:", derivative_abc)
+
+    print("---Minimization (calculation method)---")
+    minterms = get_minterms(table, variables)
+    print("Minterms:", minterms)
+
+    stages, prime_implicants = minimize_by_calculation_with_steps(minterms)
+    print_minimization_stages(stages)
+    print("Prime implicants:", prime_implicants)
+    print("Calculation result:", build_expression(prime_implicants, variables))
+
+    print("---Minimization (tabular-calculation method)---")
+    stages, prime_implicants, coverage_table, essential_implicants = minimize_by_tabular_method(minterms)
+    print_minimization_stages(stages)
+    print("Prime implicants:", prime_implicants)
+    print_coverage_table(coverage_table, minterms)
+    print("Essential implicants:", essential_implicants)
+    print("Tabular-calculation result:", build_expression(essential_implicants, variables))
+
+    print("---Minimization (Karnaugh map method)---")
+
+    if 2 <= len(variables) <= 4:
+        (
+            row_labels,
+            col_labels,
+            grid,
+            row_variables,
+            col_variables,
+            prime_implicants,
+            karnaugh_result
+        ) = minimize_by_karnaugh_map(table, variables)
+
+        print_karnaugh_map(
+            row_labels,
+            col_labels,
+            grid,
+            row_variables,
+            col_variables
+        )
+
+        print("Prime implicants:", prime_implicants)
+        print("Karnaugh result:", karnaugh_result)
+    else:
+        print("Karnaugh map supports only 2, 3 or 4 variables")
+
 
 if __name__ == "__main__":
     main()
