@@ -12,27 +12,31 @@ def gray_code(bits_count: int) -> list[str]:
     raise ValueError("Gray code supports only 1 or 2 bits")
 
 
-def get_karnaugh_axes(variables: list[str]) -> tuple[list[str], list[str]]:
+def get_karnaugh_axes(variables: list[str]) -> tuple[list[str], list[str], list[str]]:
     count = len(variables)
 
     if count == 2:
-        return [variables[0]], [variables[1]]
+        return [], [variables[0]], [variables[1]]
 
     if count == 3:
-        return [variables[0]], [variables[1], variables[2]]
+        return [], [variables[0]], [variables[1], variables[2]]
 
     if count == 4:
-        return [variables[0], variables[1]], [variables[2], variables[3]]
+        return [], [variables[0], variables[1]], [variables[2], variables[3]]
 
-    raise ValueError("Karnaugh map supports only 2, 3 or 4 variables")
+    if count == 5:
+        return [variables[0]], [variables[1], variables[2]], [variables[3], variables[4]]
+
+    raise ValueError("Karnaugh map supports only 2, 3, 4 or 5 variables")
 
 
 def build_karnaugh_map(
     table: list[dict[str, int]],
     variables: list[str]
-) -> tuple[list[str], list[str], list[list[int]], list[str], list[str]]:
-    row_variables, col_variables = get_karnaugh_axes(variables)
+) -> tuple[list[str], list[str], list[str], list[list[list[int]]], list[str], list[str], list[str]]:
+    layer_variables, row_variables, col_variables = get_karnaugh_axes(variables)
 
+    layer_labels = [""] if len(layer_variables) == 0 else gray_code(len(layer_variables))
     row_labels = gray_code(len(row_variables))
     col_labels = gray_code(len(col_variables))
 
@@ -42,41 +46,56 @@ def build_karnaugh_map(
         key = tuple(row[var] for var in variables)
         lookup[key] = row["result"]
 
-    grid = []
+    grids = []
 
-    for row_bits in row_labels:
-        current_row = []
+    for layer_bits in layer_labels:
+        grid = []
 
-        for col_bits in col_labels:
-            bits = row_bits + col_bits
-            key = tuple(int(bit) for bit in bits)
-            current_row.append(lookup[key])
+        for row_bits in row_labels:
+            current_row = []
 
-        grid.append(current_row)
+            for col_bits in col_labels:
+                bits = layer_bits + row_bits + col_bits
+                key = tuple(int(bit) for bit in bits)
+                current_row.append(lookup[key])
 
-    return row_labels, col_labels, grid, row_variables, col_variables
+            grid.append(current_row)
+
+        grids.append(grid)
+
+    return layer_labels, row_labels, col_labels, grids, layer_variables, row_variables, col_variables
 
 
 def print_karnaugh_map(
+    layer_labels: list[str],
     row_labels: list[str],
     col_labels: list[str],
-    grid: list[list[int]],
+    grids: list[list[list[int]]],
+    layer_variables: list[str],
     row_variables: list[str],
     col_variables: list[str]
 ) -> None:
-    print(f"Karnaugh map ({''.join(row_variables)} \\ {''.join(col_variables)})")
-    print(" " * 8, end="")
+    for layer_index in range(len(grids)):
+        if layer_variables:
+            print(f"Karnaugh map ({''.join(layer_variables)}={layer_labels[layer_index]})")
+        else:
+            print("Karnaugh map")
 
-    for col_label in col_labels:
-        print(col_label.rjust(4), end="")
+        print(f"({''.join(row_variables)} \\ {''.join(col_variables)})")
+        print(" " * 8, end="")
 
-    print()
+        for col_label in col_labels:
+            print(col_label.rjust(4), end="")
 
-    for i in range(len(row_labels)):
-        print(row_labels[i].ljust(8), end="")
+        print()
 
-        for value in grid[i]:
-            print(str(value).rjust(4), end="")
+        for i in range(len(row_labels)):
+            print(row_labels[i].ljust(8), end="")
+
+            for value in grids[layer_index][i]:
+                print(str(value).rjust(4), end="")
+
+            print()
 
         print()
 

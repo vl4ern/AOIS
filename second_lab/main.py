@@ -7,12 +7,11 @@ from post_classes import (belongs_to_m, belongs_to_s, belongs_to_t0, belongs_to_
 from polinom_zhegalkina import (build_zheg, get_monom_degree, get_zheg_coef_from_table, belongs_to_l)
 from fictive_perem import find_fictive_perem
 from bool_deriv import (build_part_deriv_table, build_mixed_derivative_table)
-from minimization import ( get_minterms, minimize_by_calculation_with_steps, print_minimization_stages, 
-                          build_expression, minimize_by_tabular_method, print_coverage_table)
-from karnaugh import minimize_by_karnaugh_map, print_karnaugh_map
-
+from minimization import (get_minterms, get_maxterms, minimize_by_calculation_with_steps, print_minimization_stages, build_expression,
+                            build_expression_sknf, minimize_by_tabular_method, print_coverage_table)
+from karnaugh import minimize_by_karnaugh_map, print_karnaugh_map, build_karnaugh_map
 def main():
-    expression = "(((!a -> b) & c) | !b)"
+    expression = "((a&b&!c&!d)|!e)|((a&b&!c&!d)|!e)"
     variables = get_variables(expression)
     table = build_truth_table(expression)
     print("---The trurh table---")
@@ -67,29 +66,71 @@ def main():
 
     print("---Minimization (Karnaugh map method)---")
 
-    if 2 <= len(variables) <= 4:
-        (
-            row_labels,
-            col_labels,
-            grid,
-            row_variables,
-            col_variables,
-            prime_implicants,
-            karnaugh_result
-        ) = minimize_by_karnaugh_map(table, variables)
+    if 2 <= len(variables) <= 5:
+        if len(variables) <= 4:
+            (
+                row_labels,
+                col_labels,
+                grid,
+                row_variables,
+                col_variables,
+                prime_implicants,
+                karnaugh_result
+            ) = minimize_by_karnaugh_map(table, variables)
 
-        print_karnaugh_map(
-            row_labels,
-            col_labels,
-            grid,
-            row_variables,
-            col_variables
-        )
+            print_karnaugh_map(
+                [""],
+                row_labels,
+                col_labels,
+                [grid],
+                [],
+                row_variables,
+                col_variables
+            )
 
-        print("Prime implicants:", prime_implicants)
-        print("Karnaugh result:", karnaugh_result)
+            print("Prime implicants:", prime_implicants)
+            print("Karnaugh result:", karnaugh_result)
+        else:
+            (
+                layer_labels,
+                row_labels,
+                col_labels,
+                grids,
+                layer_variables,
+                row_variables,
+                col_variables
+            ) = build_karnaugh_map(table, variables)
+
+            print_karnaugh_map(
+                layer_labels,
+                row_labels,
+                col_labels,
+                grids,
+                layer_variables,
+                row_variables,
+                col_variables
+            )
+
+            print("Karnaugh minimization for 5 variables is not implemented yet")
     else:
-        print("Karnaugh map supports only 2, 3 or 4 variables")
+        print("Karnaugh map supports only 2, 3, 4 or 5 variables")
+
+    print("---Minimization of SKNF (calculation method)---")
+    maxterms = get_maxterms(table, variables)
+    print("Maxterms:", maxterms)
+
+    stages, prime_implicants = minimize_by_calculation_with_steps(maxterms)
+    print_minimization_stages(stages)
+    print("Prime implicants:", prime_implicants)
+    print("Calculation SKNF result:", build_expression_sknf(prime_implicants, variables))
+
+    print("---Minimization of SKNF (tabular-calculation method)---")
+    stages, prime_implicants, coverage_table, essential_implicants = minimize_by_tabular_method(maxterms)
+    print_minimization_stages(stages)
+    print("Prime implicants:", prime_implicants)
+    print_coverage_table(coverage_table, maxterms)
+    print("Essential implicants:", essential_implicants)
+    print("Tabular-calculation SKNF result:", build_expression_sknf(essential_implicants, variables))
 
 
 if __name__ == "__main__":

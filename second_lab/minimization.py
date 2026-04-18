@@ -12,6 +12,20 @@ def get_minterms(table: list[dict[str, int]], variables: list[str]) -> list[str]
 
     return minterms
 
+def get_maxterms(table: list[dict[str, int]], variables: list[str]) -> list[str]:
+    maxterms = []
+
+    for row in table:
+        if row["result"] == 0:
+            term = ""
+
+            for variable in variables:
+                term += str(row[variable])
+
+            maxterms.append(term)
+
+    return maxterms
+
 
 def can_combine(term1: str, term2: str) -> bool:
     diff_count = 0
@@ -85,10 +99,32 @@ def term_to_expression(term: str, variables: list[str]) -> str:
 
     return " & ".join(parts)
 
+def term_to_expression_sknf(term: str, variables: list[str]) -> str:
+    parts = []
+
+    for i in range(len(term)):
+        if term[i] == "0":
+            parts.append(variables[i])
+        elif term[i] == "1":
+            parts.append("!" + variables[i])
+
+    if not parts:
+        return "0"
+
+    return "(" + " | ".join(parts) + ")"
+
 
 def build_expression(terms: list[str], variables: list[str]) -> str:
     expressions = [term_to_expression(t, variables) for t in terms]
     return " | ".join(expressions)
+
+def build_expression_sknf(terms: list[str], variables: list[str]) -> str:
+    expressions = [term_to_expression_sknf(t, variables) for t in terms]
+
+    if not expressions:
+        return "1"
+
+    return " & ".join(expressions)
 
 def minimize_by_calculation_with_steps(
     terms: list[str]
